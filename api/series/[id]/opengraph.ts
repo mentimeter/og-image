@@ -1,12 +1,18 @@
 import { VercelRequest, VercelResponse } from "@vercel/node";
 
 import fetch from "node-fetch";
+import { getScreenshot } from "../../_lib/opengraph/chromium";
+import { getHtml } from "../../_lib/opengraph/template";
+import { ParsedRequest } from "../../_lib/opengraph/types";
 
 const fetcher = (...args: Parameters<typeof fetch>) =>
   fetch(...args).then((res) => res.json());
 
 const getSeries = (id: string) =>
   fetcher(`https://api.stage-mentimeter.com/series/${id}`);
+
+const isDev = !process.env.AWS_REGION;
+const isHtmlDebug = process.env.OG_HTML_DEBUG === "1";
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
@@ -15,7 +21,33 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } = req;
 
     const { name } = await getSeries(id as string);
-    res.end(name);
+    const args: ParsedRequest = {
+      fileType: "png",
+      text: name,
+      theme: "light",
+      md: false,
+      fontSize: "96px",
+      images: [
+        "https://assets.vercel.com/image/upload/front/assets/design/vercel-triangle-black.svg",
+      ],
+      widths: [],
+      heights: [],
+    };
+    const html = getHtml(args);
+    if (isHtmlDebug) {
+      res.setHeader("Content-Type", "text/html");
+      res.end(html);
+      return;
+    }
+    const fileType = "png";
+    const file = await getScreenshot(html, fileType, isDev);
+    res.statusCode = 200;
+    res.setHeader("Content-Type", `image/${fileType}`);
+    res.setHeader(
+      "Cache-Control",
+      `public, immutable, no-transform, s-maxage=31536000, max-age=31536000`
+    );
+    res.end(file);
   } catch (e) {
     res.statusCode = 500;
     res.setHeader("Content-Type", "text/html");
