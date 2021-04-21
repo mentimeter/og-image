@@ -1,7 +1,7 @@
 import { IncomingMessage, ServerResponse } from "http";
-import { parseRequest } from "./_lib/parser";
-import { getScreenshot } from "./_lib/chromium";
-import { getHtml } from "./_lib/template";
+import { getScreenshot } from "../_lib/opengraph/chromium";
+import { getHtml } from "../_lib/opengraph/template";
+import { parseRequest } from "./parser";
 
 const isDev = !process.env.AWS_REGION;
 const isHtmlDebug = process.env.OG_HTML_DEBUG === "1";

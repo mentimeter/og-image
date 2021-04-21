@@ -1,6 +1,6 @@
 import { IncomingMessage } from "http";
 import { parse } from "url";
-import { ParsedRequest, Theme } from "./types";
+import { ParsedRequest, Theme } from "../_lib/opengraph/types";
 
 export function parseRequest(req: IncomingMessage) {
   console.log("HTTP " + req.url);
@@ -43,7 +43,9 @@ export function parseRequest(req: IncomingMessage) {
   return parsedRequest;
 }
 
-function getArray(stringOrArray: string[] | string | undefined): string[] {
+export function getArray(
+  stringOrArray: string[] | string | undefined
+): string[] {
   if (typeof stringOrArray === "undefined") {
     return [];
   } else if (Array.isArray(stringOrArray)) {
@@ -53,7 +55,7 @@ function getArray(stringOrArray: string[] | string | undefined): string[] {
   }
 }
 
-function getDefaultImages(images: string[], theme: Theme): string[] {
+export function getDefaultImages(images: string[], theme: Theme): string[] {
   const defaultImage =
     theme === "light"
       ? "https://assets.vercel.com/image/upload/front/assets/design/vercel-triangle-black.svg"
