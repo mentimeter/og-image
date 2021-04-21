@@ -1,8 +1,8 @@
 {
   "rewrites": [
     {
-      "source": "/(.+)",
-      "destination": "/api"
+      "source": "/api/og/(.+)",
+      "destination": "/api/og"
     }
   ]
 }
