@@ -5,14 +5,15 @@ import { getScreenshot } from "../../_lib/opengraph/chromium";
 import { getHtml } from "../../_lib/opengraph/template";
 import { TemplateData } from "../../_lib/opengraph/types";
 
+const isDev = !process.env.AWS_REGION;
+const isHtmlDebug = process.env.OG_HTML_DEBUG === "1";
+const CORE_API_URL =
+  process.env.CORE_API_URL || "https://api.stage-mentimeter.com";
+
 const fetcher = (...args: Parameters<typeof fetch>) =>
   fetch(...args).then((res) => res.json());
 
-const getSeries = (id: string) =>
-  fetcher(`https://api.stage-mentimeter.com/series/${id}`);
-
-const isDev = !process.env.AWS_REGION;
-const isHtmlDebug = process.env.OG_HTML_DEBUG === "1";
+const getSeries = (id: string) => fetcher(`${CORE_API_URL}/series/${id}`);
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   try {
