@@ -1,7 +1,6 @@
 import { readFileSync } from "fs";
-import marked from "marked";
 import { sanitizeHtml } from "./sanitizer";
-import { ParsedRequest } from "./types";
+import { TemplateData } from "./types";
 const twemoji = require("twemoji");
 const twOptions = { folder: "svg", ext: ".svg" };
 const emojify = (text: string) => twemoji.parse(text, twOptions);
@@ -16,16 +15,10 @@ const mono = readFileSync(`${__dirname}/_fonts/Vera-Mono.woff2`).toString(
   "base64"
 );
 
-function getCss(theme: string, fontSize: string) {
+function getCss() {
   let background = "white";
   let foreground = "black";
   let radial = "lightgray";
-
-  if (theme === "dark") {
-    background = "black";
-    foreground = "white";
-    radial = "dimgray";
-  }
   return `
     @font-face {
         font-family: 'Inter';
@@ -101,22 +94,22 @@ function getCss(theme: string, fontSize: string) {
 
     .heading {
         font-family: 'Inter', sans-serif;
-        font-size: ${sanitizeHtml(fontSize)};
+        font-size: 96px;
         font-style: normal;
         color: ${foreground};
         line-height: 1.8;
     }`;
 }
 
-export function getHtml(parsedReq: ParsedRequest) {
-  const { text, theme, md, fontSize } = parsedReq;
+export function getHtml(templateData: TemplateData) {
+  const { text } = templateData;
   return `<!DOCTYPE html>
 <html>
     <meta charset="utf-8">
     <title>Generated Image</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <style>
-        ${getCss(theme, fontSize)}
+        ${getCss()}
     </style>
     <body>
         <div>
@@ -126,9 +119,7 @@ export function getHtml(parsedReq: ParsedRequest) {
 
             </div>
             <div class="spacer">
-            <div class="heading">${emojify(
-              md ? marked(text) : sanitizeHtml(text)
-            )}
+            <div class="heading">${emojify(sanitizeHtml(text))}
             </div>
         </div>
     </body>

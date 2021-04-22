@@ -3,7 +3,7 @@ import { VercelRequest, VercelResponse } from "@vercel/node";
 import fetch from "node-fetch";
 import { getScreenshot } from "../../_lib/opengraph/chromium";
 import { getHtml } from "../../_lib/opengraph/template";
-import { ParsedRequest } from "../../_lib/opengraph/types";
+import { TemplateData } from "../../_lib/opengraph/types";
 
 const fetcher = (...args: Parameters<typeof fetch>) =>
   fetch(...args).then((res) => res.json());
@@ -21,17 +21,9 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     } = req;
 
     const { name } = await getSeries(id as string);
-    const args: ParsedRequest = {
+    const args: TemplateData = {
       fileType: "png",
       text: name,
-      theme: "light",
-      md: false,
-      fontSize: "96px",
-      images: [
-        "https://assets.vercel.com/image/upload/front/assets/design/vercel-triangle-black.svg",
-      ],
-      widths: [],
-      heights: [],
     };
     const html = getHtml(args);
     if (isHtmlDebug) {
